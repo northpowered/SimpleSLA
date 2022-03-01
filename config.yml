@@ -1,13 +1,13 @@
 server:
-  bind_address: '0.0.0.0'
-  port: 8800
-  refresh_time: 2
+  bind_address: '0.0.0.0'  #Ipv4 for binding http server, ex. 127.0.0.1 or 0.0.0.0
+  port: 8800 #Port for binding http server, be carefull about permissions on different port
+  refresh_time: 2 #Prometheus endpoint update time, in seconds, ex. 2
 
 global:
   unit: 'ms'
 
 local:
-  src_addr: '0.0.0.0'
+  src_addr: '0.0.0.0' 
   timeout: 1
   ttl: 64
   size: 56
