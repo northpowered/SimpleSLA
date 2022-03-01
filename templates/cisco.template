@@ -1,0 +1,6 @@
+Value RTTmin (\d+)
+Value RTTavg (\d+)
+Value RTTmax (\d+)
+
+Start
+  ^(.*) ${RTTmin}/${RTTavg}/${RTTmax} ms -> Record

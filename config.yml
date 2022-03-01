@@ -1,0 +1,58 @@
+server:
+  bind_address: '0.0.0.0'
+  port: 8800
+  refresh_time: 2
+
+global:
+  unit: 'ms'
+
+local:
+  src_addr: '0.0.0.0'
+  timeout: 1
+  ttl: 64
+  size: 56
+
+devices:
+  - name: 'myzond1'
+    type: 'm716'
+    transport: 'ssh'
+    address: '10.71.206.96'
+    username: 'admin'
+    password: 'PleaseChangeTheAdminPassword'
+    port: 22
+  - name: 'RT_2_5'
+    type: 'cisco'
+    transport: 'telnet'
+    address: '10.71.206.1'
+    username: 'adminm71'
+    password: 'Pwd12345678'
+    port: 23
+
+policies:
+  - name: mypolicy
+    max_rtt: 0.15
+    
+services:
+  - name: 'service01'
+    device: 'simplesla-local'
+    target: '10.71.206.1'
+    delay: 3
+    policy: mypolicy
+  - name: 'service02'
+    device: 'simplesla-local'
+    target: '10.71.15.11'
+    delay: 3
+  - name: 'service03'
+    device: 'simplesla-local'
+    target: '10.71.206.3'
+    delay: 3
+  - name: 'testzond1'
+    device: 'myzond1'
+    target: '192.168.1.2'
+    delay: 6
+  - name: 'testcisco'
+    device: 'RT_2_5'
+    target: '10.71.206.2'
+    delay: 4
+
+

@@ -1,0 +1,4 @@
+Value RTT (.*)
+
+Start
+  ^(.*) time=${RTT} ms -> Record

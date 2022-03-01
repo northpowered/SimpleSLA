@@ -1,0 +1,19 @@
+version: '3.5'
+
+networks:
+  simplesla-network:
+    driver: bridge
+
+services:
+  sla-simplesla:
+    image: "simplesla:1.0.1"
+    container_name: sla-simplesla
+    restart: always
+    environment:
+      - SSLA_LL=INFO
+    ports:
+     - "8800:8800"
+    volumes:
+      - ./config.yml:/app/config.yml
+    networks:
+      - simplesla-network
