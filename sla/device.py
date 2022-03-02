@@ -46,11 +46,13 @@ class Device():
         
         mapped_device = DEVICE_MAP.get(self.type,None)
         if not mapped_device:
-            LG.error(f"Unknown device type {self.type}")
+            LG.warning(f"Unknown device type {self.type}")
+            return False  #NoData status for service
         command = mapped_device['command']
         connection['device_type'] = mapped_device['connections'].get(self.transport,None)
         if not connection['device_type']:
-            LG.error(f"Unsupported transport {self.transport} for self.type device type")
+            LG.warning(f"Unsupported transport {self.transport} for self.type device type")
+            return False  #NoData status for service
         
         try:
             _= None
