@@ -5,7 +5,7 @@ from prometheus_client import start_http_server
 from time import sleep
 from sla.logger import LG, logger_init
 from sla.service import Service
-
+import sys
 
 class Sla():
     def __init__(self,config_file:str,log_level:str,log_dest:str) -> None:
@@ -32,7 +32,7 @@ class Sla():
         _ =  (self.configurator.getBindAddress(), self.configurator.getBindPort())
         start_http_server(_[1],_[0])
         LG.info(f"Prometeus HTTP endpoint started on {_[0]}:{_[1]}")
-
+        
     def __collect(self):
         _ = self.configurator.getRefreshTime()
         while True:
@@ -40,6 +40,7 @@ class Sla():
                 REGISTRY.collect()
                 LG.debug(f"Registry collection finished with delay time {_} s")
             sleep(_)
+
 
     def _run(self):
         collector_thread = Thread(target=self.__collect)

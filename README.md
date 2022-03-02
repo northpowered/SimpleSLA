@@ -3,8 +3,8 @@
 Easy SLA control system for distribiuted networks
 
 ## Usage
-
-usage: main.py [-h] -c CONFIG [-v {DEBUG,INFO,WARNING,ERROR}] [-l LOG_DEST] [--version]
+```bash
+python3 main.py -c CONFIG
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -14,12 +14,13 @@ optional arguments:
                         Logging level
   -l LOG_DEST, --log-dest LOG_DEST
                         Logging path {stdout,FILE}
-  --version             show program's version number and exit
-### Overview:
+  --version             show programs version number and exit
+```
+### Install:
 
 ```bash
     pip install -r requirements.txt
-    python3 main.py  -c config.yml -l {DEBUG,INFO,WARNING,ERROR}
+    python3 main.py  -c config.yml
 ```
 ### Docker
 

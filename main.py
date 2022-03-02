@@ -24,7 +24,6 @@ if __name__ == '__main__':
    args = vars(ap.parse_args())
    log_level = args.get('verbose')
    log_dest = args.get('log_dest')
-   
    if not log_level:
       log_level = os.getenv('SSLA_LL', 'INFO')
    if not log_dest:

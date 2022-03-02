@@ -4,6 +4,7 @@ from sla.logger import LG
 from ping3 import ping
 from sla.tracer import device_tracer, rtt_tracer
 
+
 class Device():
     def __init__(self, **parameters) -> None:
         self.name = parameters['name']
@@ -17,6 +18,21 @@ class Device():
 
         
     def __get_rtt_remote(self, target:str):
+        DEVICE_MAP = {
+            'm716':{
+                'command':f'ping -c 1 {target}',
+                'connections':{
+                    'ssh':'generic'
+                }
+            },
+            'cisco':{
+                'command':f'ping {target} repeat 1',
+                'connections':{
+                    'telnet':'cisco_ios_telnet',
+                    'ssh':''
+                }
+            }
+        }
         connection =  {
             'device_type': 'generic',
             'host': self.address,
@@ -25,26 +41,17 @@ class Device():
             'port': self.port,
         }
         command = str()
-        template = str()
+        
         #Selecting connection args in case of device type
-        if self.type == 'm716':
-            command = f"ping -c 1 {target}"
-            if self.transport == 'ssh':
-                connection['device_type'] = 'generic'
-            else:
-                LG.error(f"Unsupported transport {self.transport} for m716 device type")
-                return None
-        elif self.type == 'cisco':
-            command = f"ping {target} repeat 1"
-            if self.transport == 'telnet':
-                connection['device_type'] = 'cisco_ios_telnet'
-            elif self.transport == 'ssh':
-                pass #ssh cisco
-            else:
-                LG.error(f"Unsupported transport {self.transport} for cisco device type")
-                return None
-        else:
-            return None
+        
+        mapped_device = DEVICE_MAP.get(self.type,None)
+        if not mapped_device:
+            LG.error(f"Unknown device type {self.type}")
+        command = mapped_device['command']
+        connection['device_type'] = mapped_device['connections'].get(self.transport,None)
+        if not connection['device_type']:
+            LG.error(f"Unsupported transport {self.transport} for self.type device type")
+        
         try:
             _= None
             with ConnectHandler(**connection) as hnd:
@@ -62,7 +69,7 @@ class Device():
                 finally:
                     return _
         except FileNotFoundError:
-            LG.error(f"Template file {template} not found")
+            LG.error(f"Template file {self.template} not found")
         except NetmikoTimeoutException:
             LG.warning(f"Unreachable device. Connection with {self.name} failed")
         except NetmikoAuthenticationException as error:
