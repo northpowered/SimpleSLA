@@ -8,8 +8,8 @@ from sla.service import Service
 
 
 class Sla():
-    def __init__(self,config_file:str,log_level:str) -> None:
-        logger_init(log_level)
+    def __init__(self,config_file:str,log_level:str,log_dest:str) -> None:
+        logger_init(log_level,log_dest)
         LG.info("SimpleSLA initialization")
         self.configurator = SLAConfig(config_file=config_file)
         self.threads = list()

@@ -1,13 +1,13 @@
 from loguru import logger
 import sys
 
-LOG_DESTINATION = sys.stdout
-
 def formatter(record):
     return "{time} | {level} | {message}\n"
 
-def logger_init(log_level:str):
+def logger_init(log_level:str,log_dest:str):
     logger.remove()
-    logger.add(LOG_DESTINATION, level=log_level, format=formatter, colorize=True)
-
+    if log_dest == 'stdout':
+        log_dest = sys.stdout
+    logger.add(log_dest, level=log_level, format=formatter, colorize=True)
+  
 LG = logger
