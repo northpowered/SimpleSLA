@@ -82,6 +82,11 @@ class SLAConfig():
                 if device['type'] not in AVAILABLE_DEVICE_TYPES:
                     LG.error("Unknown device type >> {type} << ",type=device['type'])
 
+            #Appending template to device
+
+            with open(f"templates/{device['type']}.template") as template:
+                device['template'] = template
+
             #Parsing transport field in device object
             try:
                 device['transport'] = raw_device['transport']
