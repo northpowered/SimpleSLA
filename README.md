@@ -4,7 +4,17 @@ Easy SLA control system for distribiuted networks
 
 ## Usage
 
-python3 main.py [-h] -c CONFIG [-l {DEBUG,INFO,WARNING,ERROR}]
+usage: main.py [-h] -c CONFIG [-v {DEBUG,INFO,WARNING,ERROR}] [-l LOG_DEST] [--version]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -c CONFIG, --config CONFIG
+                        Path to configuration yaml file
+  -v {DEBUG,INFO,WARNING,ERROR}, --verbose {DEBUG,INFO,WARNING,ERROR}
+                        Logging level
+  -l LOG_DEST, --log-dest LOG_DEST
+                        Logging path {stdout,FILE}
+  --version             show program's version number and exit
 ### Overview:
 
 ```bash

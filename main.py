@@ -4,15 +4,15 @@ import sys
 import argparse
 import os
 if __name__ == '__main__':
-   
+
    __version__ = '1.0.1'
    __author__ = 'Romanov'
-   
+
    ap = argparse.ArgumentParser()
 
    ap.add_argument('-c', '--config', required=True,
       help='Path to configuration yaml file')
-   
+
    ap.add_argument('-v', '--verbose', required=False,
       help='Logging level',choices=['DEBUG','INFO','WARNING','ERROR'])
 
@@ -20,12 +20,11 @@ if __name__ == '__main__':
       help='Logging path {stdout,FILE}')
 
    ap.add_argument('--version', action='version', version=__version__)
-   
-   
-   
+
    args = vars(ap.parse_args())
    log_level = args.get('verbose')
    log_dest = args.get('log_dest')
+   
    if not log_level:
       log_level = os.getenv('SSLA_LL', 'INFO')
    if not log_dest:
