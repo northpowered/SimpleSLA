@@ -29,9 +29,23 @@ class Device():
                 'command':f'ping {target} repeat 1',
                 'connections':{
                     'telnet':'cisco_ios_telnet',
-                    'ssh':''
+                    'ssh':'cisco_ios'
+                }
+            },
+            'juniper':{
+                'command':f'ping {target} count 1',
+                'connections':{
+                    'telnet':'juniper_junos_telnet',
+                    'ssh':'juniper_junos'
+                }
+            },
+            'eltex':{
+                'command':f'ping {target} detailed packets 1',
+                'connections':{
+                    'ssh':'eltex'
                 }
             }
+
         }
         connection =  {
             'device_type': 'generic',
