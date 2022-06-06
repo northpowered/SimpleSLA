@@ -4,8 +4,6 @@ from sla.device import Device
 from sla.policy import Policy
 from sla.logger import LG
 
-AVAILABLE_DEVICE_TYPES = ['m716','cisco']
-AVAILABLE_DEVICE_TRANSPORT = ['ssh', 'telnet']
 AVAILABLE_SERVICE_TYPES = ['simple-check','device']
 class SLAConfig():
 
@@ -79,8 +77,11 @@ class SLAConfig():
             else:
                 if not isinstance(device['type'],str):
                     LG.error("Device type >> {type} << should be String type",type=device['type'])
-                if device['type'] not in AVAILABLE_DEVICE_TYPES:
-                    LG.error("Unknown device type >> {type} << ",type=device['type'])
+
+            #Appending template to device
+
+            with open(f"templates/{device['type']}.template") as template:
+                device['template'] = template
 
             #Parsing transport field in device object
             try:
@@ -90,8 +91,6 @@ class SLAConfig():
             else:
                 if not isinstance(device['transport'],str):
                     LG.error("Device transport >> {transport} << should be String type",transport=device['transport'])
-                if device['transport'] not in AVAILABLE_DEVICE_TRANSPORT:
-                    LG.error("Unknown device transport >> {transport} << ",transport=device['transport'])
 
             #Parsing address field in device object
             try:

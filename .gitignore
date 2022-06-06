@@ -7,6 +7,9 @@ __pycache__/
 # C extensions
 *.so
 
+.vscode/
+.mypy_cache/
+config_sample.yml
 # Distribution / packaging
 .Python
 build/

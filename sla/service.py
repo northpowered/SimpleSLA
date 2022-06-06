@@ -3,8 +3,9 @@ from sla.device import Device
 from threading import Lock
 from time import sleep
 from sla.logger import LG
+import sys
 
-SERVICE_RESULTS = dict()
+SERVICE_RESULTS: dict = dict()
 SERVICE_STATUSES = {
     'NoData': 0, #"Black"
     'Normal': 1, #"Green"
@@ -50,6 +51,7 @@ class Service():
        
 
     def check(self):
+        
         while True:
             sleep(self.delay)
             with Lock():
@@ -60,6 +62,6 @@ class Service():
                     'status': status
                 }
                 SERVICE_RESULTS[self.name] = _
-                
+
         
 
