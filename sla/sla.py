@@ -12,8 +12,8 @@ class Sla():
         logger_init(log_level,log_dest)
         LG.info("SimpleSLA initialization")
         self.configurator = SLAConfig(config_file=config_file)
-        self.threads = list()
-        self.active_services = list()
+        self.threads: list = list()
+        self.active_services: list = list()
 
     def start(self):
         self._create_services()

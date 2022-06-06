@@ -13,19 +13,12 @@ local:
   size: 56
 
 devices:
-  - name: 'myzond1'
-    type: 'm716'
-    transport: 'ssh'
-    address: '10.71.206.96'
-    username: 'admin'
-    password: 'PleaseChangeTheAdminPassword'
-    port: 22
-  - name: 'RT_2_5'
+  - name: 'RT'
     type: 'cisco'
     transport: 'telnet'
-    address: '10.71.206.1'
-    username: 'adminm71'
-    password: 'Pwd12345678'
+    address: '10.10.10.1'
+    username: 'admin'
+    password: 'cisco'
     port: 23
 
 policies:
@@ -35,24 +28,16 @@ policies:
 services:
   - name: 'service01'
     device: 'simplesla-local'
-    target: '10.71.206.1'
+    target: '192.168.0.2'
     delay: 3
     policy: mypolicy
   - name: 'service02'
     device: 'simplesla-local'
-    target: '10.71.15.11'
-    delay: 3
-  - name: 'service03'
-    device: 'simplesla-local'
-    target: '10.71.206.3'
-    delay: 3
-  - name: 'testzond1'
-    device: 'myzond1'
-    target: '192.168.1.2'
-    delay: 6
+    target: '172.16.0.2'
+    delay: 7
   - name: 'testcisco'
-    device: 'RT_2_5'
-    target: '10.71.206.2'
+    device: 'RT'
+    target: '10.10.10.2'
     delay: 4
 
 

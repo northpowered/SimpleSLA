@@ -2,6 +2,14 @@
 
 Easy SLA control system for distribiuted networks
 
+Obtain RTT value from devices, check policy and export all of this to Prometeus
+
+Supported devices:
+  - Cisco
+  - Juniper
+  - Eltex (ESR series)
+  - MT M716
+
 ## Usage
 ```bash
 python3 main.py -c CONFIG
@@ -29,10 +37,3 @@ optional arguments:
     docker run -p "8800:8800" simplesla:yourtag
 ```
 
-### Docker-compose
-
-At first, build the image with the command above and edit docker-compose.yml file
-
-```bash
-docker-compose up
-```

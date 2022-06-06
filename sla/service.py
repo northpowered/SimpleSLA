@@ -5,7 +5,7 @@ from time import sleep
 from sla.logger import LG
 import sys
 
-SERVICE_RESULTS = dict()
+SERVICE_RESULTS: dict = dict()
 SERVICE_STATUSES = {
     'NoData': 0, #"Black"
     'Normal': 1, #"Green"
