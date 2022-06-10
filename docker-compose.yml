@@ -6,7 +6,7 @@ networks:
 
 services:
   sla-simplesla:
-    image: "simplesla:1.0.1"
+    image: "simplesla:latest"
     container_name: sla-simplesla
     restart: always
     environment:
