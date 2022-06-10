@@ -1,3 +1,5 @@
+[![CodeFactor](https://www.codefactor.io/repository/github/northpowered/simplesla/badge)](https://www.codefactor.io/repository/github/northpowered/simplesla)
+
 # SimpleSLA
 
 Easy SLA control system for distribiuted networks
