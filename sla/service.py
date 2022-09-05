@@ -15,27 +15,22 @@ SERVICE_STATUSES = {
 }
 
 
-class Service:
+class BaseService:
     def __init__(
         self,
         name: str,
-        device: Device,
         target: str,
         delay: int,
-        description: str = "",
-        verbose_name: str = "",
+        description: str = str(),
+        verbose_name: str = str(),
         policy: Policy = None,
     ) -> None:
-        self.name = name
-        self.device = device
-        self.target = target
-        self.delay = delay
-        self.description = description
-        self.verbose_name = verbose_name
-        self.policy = policy
-
-    def get_name(self):
-        return self.name
+        self.name: str = name
+        self.policy: Policy = policy
+        self.target: str = target
+        self.delay: int = delay
+        self.description: str = description
+        self.verbose_name: str = verbose_name
 
     def _get_status(self, rtt):
         if rtt is False:  # failed to check and recieve rtt
@@ -66,6 +61,62 @@ class Service:
                 return SERVICE_STATUSES[
                     "NoData"
                 ]  # wrong config, but without policy. Eq to "black"
+
+    def get_name(self):
+        return self.name
+
+
+class SubService(BaseService):
+    def __init__(
+        self,
+        name: str,
+        target: str,
+        delay: int,
+        description: str = str(),
+        verbose_name: str = str(),
+        policy: Policy = None
+    ) -> None:
+        super().__init__(name, target, delay, description, verbose_name, policy)
+
+
+class ServiceGroup:
+    def __init__(
+        self,
+        name: str,
+        device: Device,
+        services: list[SubService],
+        description: str = "",
+        verbose_name: str = "",
+    ) -> None:
+        self.name: str = name
+        self.device: Device = device
+        self.services: list[SubService] = services
+        self.description: str = description
+        self.verbose_name: str = verbose_name
+
+    def check(self):
+        while True:
+            with Lock():
+                self.services = self.device.get_rtt(self.services)
+                for service in self.services:
+                    status = service._get_status(service.__getattribute__('rtt'))
+                    _ = {"rtt": service.__getattribute__('rtt'), "status": status}
+                    SERVICE_RESULTS[service.name] = _
+
+
+class Service(BaseService):
+    def __init__(
+        self,
+        name: str,
+        target: str,
+        delay: int,
+        device: Device,
+        description: str = str(),
+        verbose_name: str = str(),
+        policy: Policy = None,
+    ) -> None:
+        self.device: Device = device
+        super().__init__(name, target, delay, description, verbose_name, policy)
 
     def check(self):
 

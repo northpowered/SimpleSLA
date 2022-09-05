@@ -41,13 +41,15 @@ class SingleServiceModel(BaseModel):
 class InGroupService(BaseModel):
     name: str
     target: str
-    delay: int
+    delay: int | None
     policy: str | None
 
 
 class ServiceGroup(BaseModel):
     name: str
     device: str
+    delay: int | None
+    policy: str | None
     services: list[InGroupService]
 
 

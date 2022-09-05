@@ -1,13 +1,41 @@
+from time import sleep
 from netmiko import (
     ConnectHandler,
     NetmikoTimeoutException,
     NetmikoAuthenticationException,
+    BaseConnection
 )
 import textfsm
 from sla.logger import LG
 from ping3 import ping
-from sla.tracer import device_tracer, rtt_tracer
-from io import TextIOWrapper
+from sla.tracer import device_tracer
+from pydantic import BaseModel
+
+
+class DeviceMapping(BaseModel):
+    devices: list[str] = ["m716", "cisco", "juniper", "eltex", "potok-km-122"]
+
+    @staticmethod
+    def get_rtt_command(type: str, target: str) -> str | None:
+        commands: dict = {
+            "m716": f"ping -c 1 {target}",
+            "cisco": f"ping {target} repeat 1",
+            "juniper": f"ping {target} count 1",
+            "eltex": f"ping {target} detailed packets 1",
+            "potok-km-122": f"ping {target} count 1",
+        }
+        return commands.get(type, None)
+
+    @staticmethod
+    def get_connection_type(type: str, transport: str) -> str | None:
+        connections: dict = {
+            "m716": {"ssh": "generic"},
+            "cisco": {"telnet": "cisco_ios_telnet", "ssh": "cisco_ios"},
+            "juniper": {"telnet": "juniper_junos_telnet", "ssh": "juniper_junos"},
+            "eltex": {"ssh": "eltex"},
+            "potok-km-122": {"ssh": "generic"},
+        }
+        return connections.get(type, dict()).get(transport, None)
 
 
 class Device:
@@ -21,86 +49,64 @@ class Device:
         self.port = parameters.get("port")
         self.template = parameters.get("template", None)
 
-    def __get_rtt_remote(self, target: str):
-        DEVICE_MAP = {
-            "m716": {
-                "command": f"ping -c 1 {target}",
-                "connections": {"ssh": "generic"},
-            },
-            "cisco": {
-                "command": f"ping {target} repeat 1",
-                "connections": {"telnet": "cisco_ios_telnet", "ssh": "cisco_ios"},
-            },
-            "juniper": {
-                "command": f"ping {target} count 1",
-                "connections": {
-                    "telnet": "juniper_junos_telnet",
-                    "ssh": "juniper_junos",
-                },
-            },
-            "eltex": {
-                "command": f"ping {target} detailed packets 1",
-                "connections": {"ssh": "eltex"},
-            },
-            "potok-km-122": {
-                "command": f"ping {target} count 1",
-                "connections": {"ssh": "generic"},
-            }
-        }
-        connection = {
-            "device_type": "generic",
+    def __create_remote_connection(self) -> BaseConnection | None:
+        device_type: str = DeviceMapping().get_connection_type(self.type, self.transport)
+        if not device_type:
+            LG.warning(
+                f"Unsupported transport {self.transport} for self.type device type"
+            )
+            return None  # NoData status for service
+        connection: dict = {
+            "device_type": device_type,
             "host": self.address,
             "username": self.username,
             "password": self.password,
             "port": self.port,
         }
-        command = str()
+        return ConnectHandler(**connection)
 
-        # Selecting connection args in case of device type
-
-        mapped_device = DEVICE_MAP.get(self.type, None)
-        if not mapped_device:
-            LG.warning(f"Unknown device type {self.type}")
-            return False  # NoData status for service
-        command = mapped_device["command"]
-        connection["device_type"] = mapped_device["connections"].get(
-            self.transport, None
-        )
-        if not connection["device_type"]:
+    def __create_rtt_command(self, target: str) -> str | None:
+        command: str = DeviceMapping().get_rtt_command(self.type, target)
+        if not command:
             LG.warning(
-                f"Unsupported transport {self.transport} for self.type device type"
+                f"Unknown device type {self.type}"
             )
-            return False  # NoData status for service
+            return None  # NoData status for service
+        return command
 
+    def __get_rtt_remote(self, hnd: BaseConnection, target: str, fsm: textfsm.TextFSM):
+        _ = None
+        command: str = self.__create_rtt_command(target)
+        result = hnd.send_command(command)
+        LG.debug(f"RTT command sent to {self.name} device")
+        output = fsm.ParseText(result)
         try:
+            _ = float(output[0][0])
+        except IndexError as ex:
             _ = None
-            with ConnectHandler(**connection) as hnd:
-                LG.debug(f"Connected to {self.name} device")
-                result = hnd.send_command(command)
-                LG.debug(f"RTT command sent to {self.name} device")
-                with open(self.template, "r") as template:
-                    fsm = textfsm.TextFSM(template)
-                output = fsm.ParseText(result)
-                try:
-                    _ = float(output[0][0])
-                except IndexError as ex:
-                    _ = None
-                except Exception as ex:
-                    _ = False
-                finally:
-                    return _
-        except FileNotFoundError:
-            LG.error(f"Template file {self.template} not found")
-        except NetmikoTimeoutException:
-            LG.warning(f"Unreachable device. Connection with {self.name} failed")
-        except NetmikoAuthenticationException as error:
-            LG.warning(f"Authentication with {self.name} failed. Check credentials")
         except Exception as ex:
-            print(ex)
-        else:
-            pass
+            _ = False
         finally:
             return _
+
+    def __batch_remote_check(self, hnd: BaseConnection, targets: list, fsm: textfsm.TextFSM) -> dict:
+        iter: int = 0
+        for target in targets:
+            sleep(target.delay)
+            _ = None
+            command: str = self.__create_rtt_command(target.target)
+            result = hnd.send_command(command)
+            LG.debug(f"RTT command sent to {self.name} device")
+            output = fsm.ParseText(result)
+            try:
+                rtt = float(output[iter][0])
+            except IndexError as ex:
+                rtt = None
+            except Exception as ex:
+                rtt = False
+            target.__setattr__('rtt', rtt)
+            iter = iter + 1
+        return targets
 
     def __get_rtt_local(self, target: str):
         _ = None
@@ -115,17 +121,31 @@ class Device:
         finally:
             return _
 
-    def get_rtt(self, target: str):
+    def get_rtt(self, target: str | list) -> str | dict:
         with device_tracer.start_as_current_span(__name__) as span:
             span.set_attribute("device.type", self.type)
             span.set_attribute("device.target", target)
-            rtt = int()
-            if self.type in ["m716", "cisco", "juniper", "eltex", "potok-km-122"]:
-                rtt = self.__get_rtt_remote(target)
-            elif self.type == "local":
+            rtt = None
+            if self.type == "local":
                 rtt = self.__get_rtt_local(target)
+            elif self.type in DeviceMapping().devices:
+                try:
+                    connection: BaseConnection = self.__create_remote_connection()
+                    LG.debug(f"Connected to {self.name} device")
+                    with open(self.template, "r") as template:
+                        fsm = textfsm.TextFSM(template)
+                        if isinstance(target, str):
+                            rtt = self.__get_rtt_remote(connection, target, fsm)
+                        else:
+                            rtt = self.__batch_remote_check(connection, target, fsm)
+                except FileNotFoundError:
+                    LG.error(f"Template file {self.template} not found")
+                except NetmikoTimeoutException:
+                    LG.warning(f"Unreachable device. Connection with {self.name} failed")
+                except NetmikoAuthenticationException as error:
+                    LG.warning(f"Authentication with {self.name} failed. Check credentials")
             else:
-                LG.error(f"Unknown device type >> {self.type} << ")
+                LG.error(f"Unknown device type {self.type}")
             if rtt is not None:
                 span.set_attribute("device.rtt", rtt)
             return rtt
