@@ -7,6 +7,7 @@ import textfsm
 from sla.logger import LG
 from ping3 import ping
 from sla.tracer import device_tracer, rtt_tracer
+from io import TextIOWrapper
 
 
 class Device:
@@ -41,6 +42,10 @@ class Device:
                 "command": f"ping {target} detailed packets 1",
                 "connections": {"ssh": "eltex"},
             },
+            "potok-km-122": {
+                "command": f"ping {target} count 1",
+                "connections": {"ssh": "generic"},
+            }
         }
         connection = {
             "device_type": "generic",
@@ -73,13 +78,14 @@ class Device:
                 LG.debug(f"Connected to {self.name} device")
                 result = hnd.send_command(command)
                 LG.debug(f"RTT command sent to {self.name} device")
-                fsm = textfsm.TextFSM(self.template)
+                with open(self.template, "r") as template:
+                    fsm = textfsm.TextFSM(template)
                 output = fsm.ParseText(result)
                 try:
                     _ = float(output[0][0])
-                except IndexError:
+                except IndexError as ex:
                     _ = None
-                except Exception:
+                except Exception as ex:
                     _ = False
                 finally:
                     return _
@@ -89,6 +95,8 @@ class Device:
             LG.warning(f"Unreachable device. Connection with {self.name} failed")
         except NetmikoAuthenticationException as error:
             LG.warning(f"Authentication with {self.name} failed. Check credentials")
+        except Exception as ex:
+            print(ex)
         else:
             pass
         finally:
@@ -112,7 +120,7 @@ class Device:
             span.set_attribute("device.type", self.type)
             span.set_attribute("device.target", target)
             rtt = int()
-            if self.type in ["m716", "cisco"]:
+            if self.type in ["m716", "cisco", "juniper", "eltex", "potok-km-122"]:
                 rtt = self.__get_rtt_remote(target)
             elif self.type == "local":
                 rtt = self.__get_rtt_local(target)

@@ -1,0 +1,5 @@
+Value RTT (.*)
+Value TTL (.*)
+
+Start
+  ^(.*) TTL: ${TTL}, time: ${RTT} us -> Record
