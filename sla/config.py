@@ -84,9 +84,9 @@ class SLAConfig:
                     )
 
             # Appending template to device
-
-            with open(f"templates/{device['type']}.template") as template:
-                device["template"] = template
+            device["template"] = f"templates/{device['type']}.template"
+            # with open(f"templates/{device['type']}.template", "r") as template:
+            #     device["template"] = template
 
             # Parsing transport field in device object
             try:
