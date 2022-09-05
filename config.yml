@@ -7,7 +7,7 @@ global:
   unit: 'ms'
 
 local:
-  src_addr: '0.0.0.0' 
+  src_addr: '0.0.0.0'
   timeout: 1
   ttl: 64
   size: 56
@@ -24,7 +24,7 @@ devices:
 policies:
   - name: mypolicy
     max_rtt: 0.15
-    
+
 services:
   - name: 'service01'
     device: 'simplesla-local'
