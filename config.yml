@@ -1,43 +1,52 @@
-server:
+Server:
   bind_address: '0.0.0.0'  #Ipv4 for binding http server, ex. 127.0.0.1 or 0.0.0.0
   port: 8800 #Port for binding http server, be carefull about permissions on different port
   refresh_time: 2 #Prometheus endpoint update time, in seconds, ex. 2
 
-global:
+Global:
   unit: 'ms'
 
-local:
-  src_addr: '0.0.0.0'
+Local:
+  src_addr: '0.0.0.0' 
   timeout: 1
   ttl: 64
   size: 56
 
-devices:
-  - name: 'RT'
+Devices:
+  - name: 'my_rt'
+    type: 'cisco'
+    transport: 'ssh'
+    address: '192.168.0.9'
+    username: 'admin'
+    password: 'password'
+    port: 22
+  - name: 'my_rt_2'
     type: 'cisco'
     transport: 'telnet'
-    address: '10.10.10.1'
-    username: 'admin'
+    address: '172.5.6.2'
+    username: 'cisco'
     password: 'cisco'
     port: 23
 
-policies:
+Policies:
   - name: mypolicy
     max_rtt: 0.15
 
-services:
+ServicesGroups:
+  - name: mygroup
+    device: 'my_rt_2'
+    delay: 6
+    services:
+      - name: serv1
+        target: '16.35.48.3'
+        delay: 3
+        policy: mypolicy
+      - name: serv2
+        target: '10.71.206.75'
+
+Services:
   - name: 'service01'
     device: 'simplesla-local'
-    target: '192.168.0.2'
-    delay: 3
+    target: '192.168.0.1'
+    delay: 20
     policy: mypolicy
-  - name: 'service02'
-    device: 'simplesla-local'
-    target: '172.16.0.2'
-    delay: 7
-  - name: 'testcisco'
-    device: 'RT'
-    target: '10.10.10.2'
-    delay: 4
-
-

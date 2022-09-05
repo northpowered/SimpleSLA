@@ -1,4 +1,3 @@
-from sla.sla import Sla
 import sys
 import argparse
 import os
@@ -6,7 +5,7 @@ import os
 
 if __name__ == "__main__":
 
-    __version__ = "1.0.3"
+    __version__ = "2.0.0"
     __author__ = "https://github.com/northpowered"
 
     ap = argparse.ArgumentParser()
@@ -37,6 +36,9 @@ if __name__ == "__main__":
     if not log_dest:
         log_dest = os.getenv("SSLA_LD", "stdout")
     try:
+        from sla.config import config
+        config.load(args.get("config"))
+        from sla.sla import Sla
         sla = Sla(
             config_file=args.get("config"), log_level=log_level, log_dest=log_dest
         )

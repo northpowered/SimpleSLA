@@ -19,7 +19,7 @@ Supported devices:
   - Potok KM-122
 
 TODO:
-  - Extend devices support
+  - Extending devices support
   - Export data via logs (Loki way)
   - Authentication via ssh with keys
   - Logic for global_unit parameter
@@ -124,3 +124,20 @@ Configuration of *simplesla-local* device
       target: '10.10.10.2'
       delay: 4
   ```
+#### Services groups
+> To avoid multiple connections to one device, you can group your services, which should
+be checked from one point
+```yaml
+ServicesGroups:
+  - name: mygroup
+    device: mydevice
+    policy: policy_for_all_subservices_without_own_policy
+    delay: 4  #the same for delay
+    services:
+      - name: serv1
+        target: '192.168.0.6'
+        policy: my_own_policy
+      - name: serv2
+        target: '10.3.5.3'
+        delay: 3
+```
