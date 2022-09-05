@@ -7,6 +7,7 @@ from sla.logger import LG, logger_init
 from sla.service import Service
 import sys
 
+
 class Sla:
     def __init__(self, config_file: str, log_level: str, log_dest: str) -> None:
         logger_init(log_level, log_dest)

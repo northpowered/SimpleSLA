@@ -16,6 +16,7 @@ Supported devices:
   - Juniper
   - Eltex (ESR series)
   - MT M716
+  - Potok KM-122
 
 TODO:
   - Extend devices support
@@ -41,6 +42,17 @@ optional arguments:
                         Logging path {stdout,FILE}
   --version             show programs version number and exit
 ```
+
+## SLA statuses
+
+| Status      | Int value   | Reccomended color | Description |
+| ----------- | ----------- |------------------ |------------ |
+| NoData      | 0           | Black             | No recieved data or parcing error |
+| Normal      | 1           | Green             | Target is available and RTT less then policy |
+| Warning     | 2           | Yellow            | Target is available and RTT bigger then policy |
+| Error       | 3           | Red               | Target is unavailable |
+| OutOfService| 4           | Green             | Target is available and policy was not defined |
+
 ### Install:
 
 ```bash

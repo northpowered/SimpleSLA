@@ -6,7 +6,7 @@ import os
 
 if __name__ == "__main__":
 
-    __version__ = "1.0.2"
+    __version__ = "1.0.3"
     __author__ = "https://github.com/northpowered"
 
     ap = argparse.ArgumentParser()
