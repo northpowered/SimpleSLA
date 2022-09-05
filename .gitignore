@@ -10,6 +10,7 @@ __pycache__/
 .vscode/
 .mypy_cache/
 config_sample.yml
+config_potok.yml
 # Distribution / packaging
 .Python
 build/
