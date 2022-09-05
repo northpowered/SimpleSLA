@@ -21,14 +21,15 @@ class Sla:
         self.policies: dict = dict()
 
     def _load_devices(self):
-        for device in config.Devices.Devices:
-            self.devices.update(
-                {
-                    device.name: SLADevice(
-                        **device.to_sla_device()
-                    )
-                }
-            )
+        if config.Policies.Policies:
+            for device in config.Devices.Devices:
+                self.devices.update(
+                    {
+                        device.name: SLADevice(
+                            **device.to_sla_device()
+                        )
+                    }
+                )
         self.devices.update(
             {
                 'simplesla-local': SLADevice(
@@ -39,6 +40,8 @@ class Sla:
         )
 
     def _load_policies(self):
+        if not config.Policies.Policies:
+            return
         for policy in config.Policies.Policies:
             self.policies.update(
                 {
@@ -50,6 +53,8 @@ class Sla:
             )
 
     def _load_services(self):
+        if not config.Services.Services:
+            return
         for service in config.Services.Services:
             self.services.update(
                 {
@@ -66,6 +71,8 @@ class Sla:
             )
 
     def _load_service_groups(self):
+        if not config.ServicesGroups.ServicesGroups:
+            return
         for service_group in config.ServicesGroups.ServicesGroups:
             sub_services: list[SubService] = list()
             for sub in service_group.services:

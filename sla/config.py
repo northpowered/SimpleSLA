@@ -157,7 +157,7 @@ class SLAConfig(BaseSettings):
 
     def read_from_dict(self, raw_data: dict):
         for section_name in self.__fields__:
-            section_data: dict = raw_data.get(section_name, dict())
+            section_data: dict = raw_data.get(section_name)
             section: BaseSectionModel = self.__getattribute__(section_name)
             self.__setattr__(
                 section_name,
