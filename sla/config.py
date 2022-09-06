@@ -1,8 +1,5 @@
 import yaml
 from pydantic import BaseModel, ValidationError, validator, BaseSettings
-from sla.service import Service
-from sla.device import Device
-from sla.policy import Policy
 from sla.logger import LG
 import os
 import ipaddress

@@ -10,6 +10,7 @@ from sla.logger import LG
 from ping3 import ping
 from sla.tracer import device_tracer
 from pydantic import BaseModel
+from sla import SLAConfig
 
 
 class DeviceMapping(BaseModel):
@@ -111,7 +112,14 @@ class Device:
     def __get_rtt_local(self, target: str):
         _ = None
         try:
-            _ = ping(target, timeout=1, unit="ms", src_addr="0.0.0.0", ttl=64, size=56)
+            _ = ping(
+                target,
+                timeout=SLAConfig.Local.timeout,
+                unit=SLAConfig.Global.unit,
+                src_addr=SLAConfig.Local.src_addr,
+                ttl=SLAConfig.Local.ttl,
+                size=SLAConfig.Local.timeout
+            )
         except UnicodeError:
             LG.error(f"Wrong Ipv4 syntax: {target}")
         except OSError as error:
@@ -124,7 +132,6 @@ class Device:
     def get_rtt(self, target: str | list) -> str | dict:
         with device_tracer.start_as_current_span(__name__) as span:
             span.set_attribute("device.type", self.type)
-            span.set_attribute("device.target", target)
             rtt = None
             if self.type == "local":
                 rtt = self.__get_rtt_local(target)
@@ -146,6 +153,4 @@ class Device:
                     LG.warning(f"Authentication with {self.name} failed. Check credentials")
             else:
                 LG.error(f"Unknown device type {self.type}")
-            if rtt is not None:
-                span.set_attribute("device.rtt", rtt)
             return rtt

@@ -1,9 +1,8 @@
-from sla.policy import Policy
-from sla.device import Device
+from .device import Device as SLADevice
+from .policy import Policy as SLAPolicy
 from threading import Lock
 from time import sleep
-from sla.logger import LG
-import sys
+
 
 SERVICE_RESULTS: dict = dict()
 SERVICE_STATUSES = {
@@ -23,10 +22,10 @@ class BaseService:
         delay: int,
         description: str = str(),
         verbose_name: str = str(),
-        policy: Policy = None,
+        policy: SLAPolicy = None,
     ) -> None:
         self.name: str = name
-        self.policy: Policy = policy
+        self.policy: SLAPolicy = policy
         self.target: str = target
         self.delay: int = delay
         self.description: str = description
@@ -74,7 +73,7 @@ class SubService(BaseService):
         delay: int,
         description: str = str(),
         verbose_name: str = str(),
-        policy: Policy = None
+        policy: SLAPolicy = None
     ) -> None:
         super().__init__(name, target, delay, description, verbose_name, policy)
 
@@ -83,13 +82,13 @@ class ServiceGroup:
     def __init__(
         self,
         name: str,
-        device: Device,
+        device: SLADevice,
         services: list[SubService],
         description: str = "",
         verbose_name: str = "",
     ) -> None:
         self.name: str = name
-        self.device: Device = device
+        self.device: SLADevice = device
         self.services: list[SubService] = services
         self.description: str = description
         self.verbose_name: str = verbose_name
@@ -110,12 +109,12 @@ class Service(BaseService):
         name: str,
         target: str,
         delay: int,
-        device: Device,
+        device: SLADevice,
         description: str = str(),
         verbose_name: str = str(),
-        policy: Policy = None,
+        policy: SLAPolicy = None,
     ) -> None:
-        self.device: Device = device
+        self.device: SLADevice = device
         super().__init__(name, target, delay, description, verbose_name, policy)
 
     def check(self):

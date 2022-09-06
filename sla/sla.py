@@ -1,12 +1,16 @@
 from threading import Thread, Lock
-from sla.device import Device as SLADevice
+from sla import (
+    SLADevice,
+    SLAService,
+    SLAServiceGroup,
+    SLAConfig,
+    SLAPolicy,
+    SLASubService
+)
 from sla.generator import REGISTRY, Collector
 from prometheus_client import start_http_server
 from time import sleep
 from sla.logger import LG, logger_init
-from sla.policy import Policy
-from sla.service import Service, ServiceGroup, SubService
-from sla.config import config
 
 
 class Sla:
@@ -21,8 +25,8 @@ class Sla:
         self.policies: dict = dict()
 
     def _load_devices(self):
-        if config.Policies.Policies:
-            for device in config.Devices.Devices:
+        if SLAConfig.Policies.Policies:
+            for device in SLAConfig.Devices.Devices:
                 self.devices.update(
                     {
                         device.name: SLADevice(
@@ -40,12 +44,12 @@ class Sla:
         )
 
     def _load_policies(self):
-        if not config.Policies.Policies:
+        if not SLAConfig.Policies.Policies:
             return
-        for policy in config.Policies.Policies:
+        for policy in SLAConfig.Policies.Policies:
             self.policies.update(
                 {
-                    policy.name: Policy(
+                    policy.name: SLAPolicy(
                         name=policy.name,
                         max_rtt=policy.max_rtt
                     )
@@ -53,12 +57,12 @@ class Sla:
             )
 
     def _load_services(self):
-        if not config.Services.Services:
+        if not SLAConfig.Services.Services:
             return
-        for service in config.Services.Services:
+        for service in SLAConfig.Services.Services:
             self.services.update(
                 {
-                    service.name: Service(
+                    service.name: SLAService(
                         name=service.name,
                         target=service.target,
                         delay=service.delay,
@@ -71,17 +75,17 @@ class Sla:
             )
 
     def _load_service_groups(self):
-        if not config.ServicesGroups.ServicesGroups:
+        if not SLAConfig.ServicesGroups.ServicesGroups:
             return
-        for service_group in config.ServicesGroups.ServicesGroups:
-            sub_services: list[SubService] = list()
+        for service_group in SLAConfig.ServicesGroups.ServicesGroups:
+            sub_services: list[SLASubService] = list()
             for sub in service_group.services:
                 if not sub.delay:
                     sub.delay = service_group.delay
                 if not sub.policy:
                     sub.policy = service_group.policy
                 sub_services.append(
-                    SubService(
+                    SLASubService(
                         name=sub.name,
                         target=sub.target,
                         delay=sub.delay,
@@ -92,7 +96,7 @@ class Sla:
                 )
             self.service_groups.update(
                 {
-                    service_group.name: ServiceGroup(
+                    service_group.name: SLAServiceGroup(
                         name=service_group.name,
                         device=self.devices.get(service_group.device),
                         description='foobar',
@@ -125,12 +129,12 @@ class Sla:
 
         REGISTRY.register(Collector())
         LG.info("Services was registered in registry collector")
-        _ = (config.Server.bind_address, config.Server.port)
+        _ = (SLAConfig.Server.bind_address, SLAConfig.Server.port)
         start_http_server(_[1], _[0])
         LG.info(f"Prometeus HTTP endpoint started on {_[0]}:{_[1]}")
 
     def __collect(self):
-        _ = config.Server.refresh_time
+        _ = SLAConfig.Server.refresh_time
         while True:
             with Lock():
                 REGISTRY.collect()
