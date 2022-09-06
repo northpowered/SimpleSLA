@@ -36,8 +36,8 @@ if __name__ == "__main__":
     if not log_dest:
         log_dest = os.getenv("SSLA_LD", "stdout")
     try:
-        from sla.config import config
-        config.load(args.get("config"))
+        from sla import SLAConfig
+        SLAConfig.load(args.get("config"))
         from sla.sla import Sla
         sla = Sla(
             config_file=args.get("config"), log_level=log_level, log_dest=log_dest
