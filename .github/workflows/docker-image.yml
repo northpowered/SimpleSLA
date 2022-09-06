@@ -22,6 +22,6 @@ jobs:
         password: ${{ secrets.CR_PAT }}
     - name: Build and publish the Docker image
       run: |
-        docker build . --file Dockerfile --tag simple-sla:latest
+        docker build . --file Dockerfile --tag ghcr.io/northpowered/simple-sla:latest
         docker run ghcr.io/northpowered/simple-sla:latest
         docker push ghcr.io/northpowered/simple-sla:latest
