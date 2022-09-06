@@ -46,11 +46,3 @@ jobs:
         push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-
-    
-    - name: Build and publish the Docker image
-      run: |
-        docker build . --file Dockerfile --tag ghcr.io/northpowered/simple-sla:latest
-        docker run --name simple-sla ghcr.io/northpowered/simple-sla:latest
-        docker stop simple-sla
-        docker push ghcr.io/northpowered/simple-sla:latest
