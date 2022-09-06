@@ -2,6 +2,8 @@
 
 FROM python:3.10-buster
 
+LABEL org.opencontainers.image.source="https://github.com/northpowered/SimpleSLA"
+
 WORKDIR /app
 
 COPY requirements.txt requirements.txt
