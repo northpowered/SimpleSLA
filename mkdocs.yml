@@ -1,0 +1,17 @@
+site_name: SimpleSLA
+site_description: Easy and ICMP-based network SLA control system
+repo_url: https://github.com/northpowered/SimpleSLA
+repo_name: northpowered/SimpleSLA
+theme:
+  name: material
+  language: en
+  features:
+  - navigation.tracking
+plugins:
+  - tags
+markdown_extensions:
+  - tables
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+
