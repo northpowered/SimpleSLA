@@ -138,7 +138,7 @@ class Sla:
         while True:
             with Lock():
                 REGISTRY.collect()
-                LG.debug(f"Registry collection finished with delay time {_} s")
+                LG.info(f"Registry collection finished with delay time {_} s")
             sleep(_)
 
     def _run(self):

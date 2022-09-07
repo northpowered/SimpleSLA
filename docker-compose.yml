@@ -5,9 +5,9 @@ networks:
     driver: bridge
 
 services:
-  sla-simplesla:
-    image: "simplesla:latest"
-    container_name: sla-simplesla
+  simple-sla:
+    image: "ghcr.io/northpowered/simple-sla:latest"
+    container_name: simple-sla
     restart: always
     environment:
       - SSLA_LL=INFO

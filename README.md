@@ -1,5 +1,5 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/northpowered/simplesla/badge)](https://www.codefactor.io/repository/github/northpowered/simplesla)
-
+[![Docker Image CI/CD](https://github.com/northpowered/SimpleSLA/actions/workflows/docker-image.yml/badge.svg)](https://github.com/northpowered/SimpleSLA/actions/workflows/docker-image.yml)
 # SimpleSLA
 
 Easy SLA control system for distribiuted networks
@@ -29,6 +29,12 @@ TODO:
   - Tests
 
 ## Usage
+
+### Running from source
+> pip install -r requirements.txt
+
+> python3 main.py  -c config.yml
+### In CLI mode
 ```bash
 python3 main.py -c CONFIG
 
@@ -42,10 +48,13 @@ optional arguments:
                         Logging path {stdout,FILE}
   --version             show programs version number and exit
 ```
+### Using docker image
+> docker pull ghcr.io/northpowered/simple-sla:latest
 
+> docker run --name simple-sla ghcr.io/northpowered/simple-sla:latest
 ## SLA statuses
 
-| Status      | Int value   | Reccomended color | Description |
+| Status      | Int value   | Recommended color | Description |
 | ----------- | ----------- |------------------ |------------ |
 | NoData      | 0           | Black             | No recieved data or parcing error |
 | Normal      | 1           | Green             | Target is available and RTT less then policy |
@@ -53,20 +62,7 @@ optional arguments:
 | Error       | 3           | Red               | Target is unavailable |
 | OutOfService| 4           | Green             | Target is available and policy was not defined |
 
-### Install:
-
-```bash
-    pip install -r requirements.txt
-    python3 main.py  -c config.yml
-```
-### Docker
-
-```bash
-    docker build -t simplesla:yourtag .
-    docker run -p "8800:8800" simplesla:yourtag
-```
-
-### Configuration
+## Configuration
 
 All config is represented in YAML format
 
