@@ -3,7 +3,8 @@ from netmiko import (
     ConnectHandler,
     NetmikoTimeoutException,
     NetmikoAuthenticationException,
-    BaseConnection
+    BaseConnection,
+    ReadTimeout
 )
 import textfsm
 from sla.logger import LG
@@ -96,9 +97,15 @@ class Device:
             sleep(target.delay)
             _ = None
             command: str = self.__create_rtt_command(target.target)
-            result = hnd.send_command(command)
-            LG.debug(f"RTT command sent to {self.name} device")
+            try:
+                result = hnd.send_command(command)
+            except ReadTimeout:
+                LG.debug(f"ReadTimeout error on {self.name} device for {target.target} target")
+                continue  # Ignore ReadTimeout error and continue checking
+            LG.debug(f"Command [{command}] sent to {self.name} device")
+            LG.debug(f"Recieved [{result}] from {self.name} device")
             output = fsm.ParseText(result)
+            LG.debug(f"Parsed data [{output}] from {self.name} device")
             try:
                 rtt = float(output[iter][0])
             except IndexError as ex:
