@@ -84,15 +84,14 @@ class Device:
         output = fsm.ParseText(result)
         try:
             _ = float(output[0][0])
-        except IndexError as ex:
+        except IndexError:
             _ = None
-        except Exception as ex:
+        except Exception:
             _ = False
-        finally:
-            return _
+        return _
 
     def __batch_remote_check(self, hnd: BaseConnection, targets: list, fsm: textfsm.TextFSM) -> dict:
-        iter: int = 0
+        result_iterator: int = 0
         for target in targets:
             sleep(target.delay)
             _ = None
@@ -107,13 +106,13 @@ class Device:
             output = fsm.ParseText(result)
             LG.debug(f"Parsed data [{output}] from {self.name} device")
             try:
-                rtt = float(output[iter][0])
-            except IndexError as ex:
+                rtt = float(output[result_iterator][0])
+            except IndexError:
                 rtt = None
-            except Exception as ex:
+            except Exception:
                 rtt = False
             target.__setattr__('rtt', rtt)
-            iter = iter + 1
+            result_iterator = result_iterator + 1
         return targets
 
     def __get_rtt_local(self, target: str):
@@ -131,10 +130,7 @@ class Device:
             LG.error(f"Wrong Ipv4 syntax: {target}")
         except OSError as error:
             LG.error(f"Source interface/address {error} is not exist")
-        else:
-            pass
-        finally:
-            return _
+        return _
 
     def get_rtt(self, target: str | list) -> str | dict:
         with device_tracer.start_as_current_span(__name__) as span:
@@ -156,7 +152,7 @@ class Device:
                     LG.error(f"Template file {self.template} not found")
                 except NetmikoTimeoutException:
                     LG.warning(f"Unreachable device. Connection with {self.name} failed")
-                except NetmikoAuthenticationException as error:
+                except NetmikoAuthenticationException:
                     LG.warning(f"Authentication with {self.name} failed. Check credentials")
             else:
                 LG.error(f"Unknown device type {self.type}")
